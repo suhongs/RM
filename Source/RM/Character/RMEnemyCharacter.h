@@ -14,7 +14,19 @@ class RM_API ARMEnemyCharacter : public ARMCharacterBase
 {
 	GENERATED_BODY()
 	
+public:
+	ARMEnemyCharacter();
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	//UFUNCTION(BlueprintCallable)
+	//virtual void HighlightActor();
+
+	//UFUNCTION(BlueprintCallable)
+	//virtual void UnHighlightActor();
 	
-	
+protected:
+	virtual void BeginPlay() override;
+	virtual void InitAbilityActorInfo() override;
 	
 };

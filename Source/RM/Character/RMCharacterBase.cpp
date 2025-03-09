@@ -2,6 +2,8 @@
 
 
 #include "Character/RMCharacterBase.h"
+#include "AbilitySystem/RMAbilitySystemComponent.h"
+#include "AbilitySystem/RMAttributeSet.h"
 
 
 // Sets default values
@@ -9,7 +11,6 @@ ARMCharacterBase::ARMCharacterBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
@@ -17,6 +18,33 @@ void ARMCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void ARMCharacterBase::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+
+	InitAbilityActorInfo();
+	InitDefaultAbility();
+}
+
+void ARMCharacterBase::InitAbilityActorInfo()
+{
+}
+
+void ARMCharacterBase::InitDefaultAbility()
+{
+	if (IsValid(AbilitySystemComponent) == false)
+		return;
+
+	for (auto Ability : DefaultAbilities)
+	{
+		if (IsValid(Ability) == false)
+			continue;
+
+		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 0, 0, this));
+	}
 }
 
 // Called every frame
@@ -31,5 +59,10 @@ void ARMCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+UAbilitySystemComponent* ARMCharacterBase::GetAbilitySystemComponent() const
+{
+	return this->AbilitySystemComponent;
 }
 

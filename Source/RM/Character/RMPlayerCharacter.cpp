@@ -4,9 +4,10 @@
 #include "Character/RMPlayerCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/RMPlayerState.h"
+#include "AbilitySystem/RMAbilitySystemComponent.h"
 
 ARMPlayerCharacter::ARMPlayerCharacter()
 {
@@ -20,4 +21,25 @@ ARMPlayerCharacter::ARMPlayerCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerFollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+}
+
+void ARMPlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	InitAbilityActorInfo();
+	InitDefaultAbility();
+}
+
+void ARMPlayerCharacter::InitAbilityActorInfo()
+{
+	ARMPlayerState* PS = GetPlayerState<ARMPlayerState>();
+	if (!IsValid(PS))
+		return;
+
+	AbilitySystemComponent = PS->GetAbilitySystemComponent();
+	if (AbilitySystemComponent == nullptr)
+		return;
+
+	AbilitySystemComponent->InitAbilityActorInfo(PS, this);
 }

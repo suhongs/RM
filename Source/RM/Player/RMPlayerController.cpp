@@ -11,9 +11,7 @@
 
 ARMPlayerController::ARMPlayerController()
 {
-	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 
-	bReplicates = true;
 }
 
 void ARMPlayerController::BeginPlay()
@@ -24,6 +22,13 @@ void ARMPlayerController::BeginPlay()
 	if (Subsystem)
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
+	}
+
+	ARMCharacterBase* PawnCharacter = GetPawn<ARMCharacterBase>();
+
+	if (PawnCharacter)
+	{
+		AbilitySystemComponent = PawnCharacter->AbilitySystemComponent;
 	}
 }
 
@@ -44,12 +49,17 @@ void ARMPlayerController::SetupInputComponent()
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ARMPlayerController::Look);
+
+		// Combat
+		EnhancedInputComponent->BindAction(LightAttackAction, ETriggerEvent::Started, this, &ARMPlayerController::LightAttack);
+		EnhancedInputComponent->BindAction(HeavyAttackAction, ETriggerEvent::Started, this, &ARMPlayerController::HeavyAttack);
+
 	}
 }
 
 UAbilitySystemComponent* ARMPlayerController::GetAbilitySystemComponent() const
 {
-	return nullptr;
+	return AbilitySystemComponent;
 }
 
 void ARMPlayerController::Move(const FInputActionValue& Value)
@@ -100,4 +110,41 @@ void ARMPlayerController::StopJump(const FInputActionValue& Value)
 		return;
 
 	ControlledCharacter->StopJumping();
+}
+
+void ARMPlayerController::LightAttack()
+{
+	if (AbilitySystemComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is nullptr"));
+		return;
+	}
+
+	FGameplayTag LightAttackTag = FGameplayTag::RequestGameplayTag(FName("Player.Attack.LightAttack"));
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(LightAttackTag);
+
+	bool result = AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
+}
+
+void ARMPlayerController::HeavyAttack()
+{
+	if (AbilitySystemComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is nullptr"));
+		return;
+	}
+
+	FGameplayTag HeavyAttackTag = FGameplayTag::RequestGameplayTag(FName("Player.Attack.HeavyAttack"));
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(HeavyAttackTag);
+
+	bool bActivated = AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
+
+	if (!bActivated)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to activate HeavyAttack ability"));
+	}
 }

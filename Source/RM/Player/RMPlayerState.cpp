@@ -2,7 +2,24 @@
 
 
 #include "Player/RMPlayerState.h"
+#include "AbilitySystem/RMAbilitySystemComponent.h"
+#include "AbilitySystem/RMAttributeSet.h"
 
+ARMPlayerState::ARMPlayerState()
+{
+	AbilitySystemComponent = CreateDefaultSubobject<URMAbilitySystemComponent>("AbilitySystemComponent");
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
+	AttributeSet = CreateDefaultSubobject<URMAttributeSet>("AttributeSet");
+}
 
+UAbilitySystemComponent* ARMPlayerState::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
 
+UAttributeSet* ARMPlayerState::GetAttributeSet() const
+{
+	return AttributeSet;
+}

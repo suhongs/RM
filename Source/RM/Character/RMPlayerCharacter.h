@@ -19,6 +19,10 @@ class RM_API ARMPlayerCharacter : public ARMCharacterBase
 	
 public:
 	ARMPlayerCharacter();
+	virtual void PossessedBy(AController* NewController) override;
+
+protected:
+	virtual void InitAbilityActorInfo();
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
