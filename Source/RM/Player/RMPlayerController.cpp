@@ -88,8 +88,8 @@ void ARMPlayerController::Look(const FInputActionValue& Value)
 {
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	AddYawInput(LookAxisVector.X);
-	AddPitchInput(LookAxisVector.Y);
+	AddYawInput(LookAxisVector.X * this->LookSensitivity);
+	AddPitchInput(LookAxisVector.Y * this->LookSensitivity);
 }
 
 void ARMPlayerController::Jump(const FInputActionValue& Value)

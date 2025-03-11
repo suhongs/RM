@@ -31,6 +31,7 @@ void ARMCharacterBase::PossessedBy(AController* NewController)
 
 void ARMCharacterBase::InitAbilityActorInfo()
 {
+
 }
 
 void ARMCharacterBase::InitDefaultAbility()

@@ -21,7 +21,7 @@ void ARMEnemyCharacter::PossessedBy(AController* NewController)
 
 void ARMEnemyCharacter::BeginPlay()
 {
-
+	Super::BeginPlay();
 }
 
 void ARMEnemyCharacter::InitAbilityActorInfo()
