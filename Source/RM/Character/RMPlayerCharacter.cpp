@@ -137,3 +137,14 @@ void ARMPlayerCharacter::HitReact()
 {
 	Super::HitReact();
 }
+
+void ARMPlayerCharacter::RotateCharacterToCameraYaw()
+{
+	if (Controller)
+	{
+		// 카메라 방향 기준으로 캐릭터 회전
+		const FRotator ControlRot = Controller->GetControlRotation();
+		const FRotator NewYawRot(0.f, ControlRot.Yaw, 0.f); // Pitch, Roll 제거하고 Yaw만 사용
+		SetActorRotation(NewYawRot); // 이걸로 공격 방향이 카메라 방향이 됨
+	}
+}

@@ -64,6 +64,8 @@ void ARMPlayerController::SetupInputComponent()
 
 		// Utilities
 		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Started, this, &ARMPlayerController::Roll);
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &ARMPlayerController::Dodge);
+
 	}
 }
 
@@ -206,4 +208,63 @@ void ARMPlayerController::Roll()
 
 	bool result = AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
 
+}
+
+void ARMPlayerController::Dodge()
+{
+	ARMCharacterBase* ControlledCharacter = Cast<ARMCharacterBase>(GetPawn());
+	if (!IsValid(ControlledCharacter))
+		return;
+
+	if (AbilitySystemComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is nullptr"));
+		return;
+	}
+
+	// 기본값은 캐릭터가 보고 있는 방향
+	FVector DodgeDirection = ControlledCharacter->GetActorForwardVector();
+	FRotator ControlRot = GetControlRotation();
+
+	FString DirectionTagStr = TEXT("None");
+
+	if (MovementVector.SizeSquared() > 0)
+	{
+		// 카메라 Yaw만 사용해서 Forward/Right 방향 구함
+		const FRotator YawRotation(0, ControlRot.Yaw, 0);
+
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		// 입력 방향 (MovementVector) + 카메라 기준 방향 → 최종 대시 방향
+		DodgeDirection = ForwardDirection * MovementVector.Y + RightDirection * MovementVector.X;
+
+		// 방향 판별은 캐릭터 기준으로 계산
+		FVector DodgeDirNormalized = DodgeDirection.GetSafeNormal();
+		float ForwardDot = FVector::DotProduct(DodgeDirNormalized, ControlledCharacter->GetActorForwardVector());
+		float RightDot = FVector::DotProduct(DodgeDirNormalized, ControlledCharacter->GetActorRightVector());
+
+		if (FMath::Abs(ForwardDot) > FMath::Abs(RightDot))
+		{
+			DirectionTagStr = ForwardDot > 0 ? TEXT("FW") : TEXT("BW");
+		}
+		else
+		{
+			DirectionTagStr = RightDot > 0 ? TEXT("R") : TEXT("L");
+		}
+	}
+	else
+	{
+		// 입력이 없으면 바라보는 방향 기준으로 전방 대시
+		DirectionTagStr = TEXT("FW");
+	}
+
+	// 태그 생성 및 어빌리티 활성화
+	FString FullTagName = FString::Printf(TEXT("Player.Utilities.Dodge.%s"), *DirectionTagStr);
+	FGameplayTag DodgeTag = FGameplayTag::RequestGameplayTag(FName(*FullTagName));
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(DodgeTag);
+
+	bool bSuccess = AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
 }

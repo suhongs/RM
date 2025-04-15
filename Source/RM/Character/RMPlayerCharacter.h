@@ -42,4 +42,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects/LightAttack")
 	TSubclassOf<UGameplayEffect> LightAttackEffect;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	void RotateCharacterToCameraYaw();
 };
