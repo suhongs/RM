@@ -17,14 +17,15 @@ class RM_API URMGameplayAbilityCombo : public URMGameplayAbilityBase
 public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-	UFUNCTION()
-	void OnEndAbility();
+	virtual void OnEndAbility() override;
 
 	UFUNCTION()
 	virtual void OnComboWindowOpen(FGameplayEventData Payload);
 
 	UFUNCTION()
 	virtual void OnComboWindowEnd(FGameplayEventData Payload);
+
+	void RemoveAllComboWindowTag();
 
 public:
 

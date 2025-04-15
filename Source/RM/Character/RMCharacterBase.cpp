@@ -4,6 +4,7 @@
 #include "Character/RMCharacterBase.h"
 #include "AbilitySystem/RMAbilitySystemComponent.h"
 #include "AbilitySystem/RMAttributeSet.h"
+#include "AbilitySystem/GameplayEffect/RMGameplayEffectBase.h"
 
 
 // Sets default values
@@ -23,10 +24,6 @@ void ARMCharacterBase::BeginPlay()
 void ARMCharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
-
-	InitAbilityActorInfo();
-	InitDefaultAbility();
 }
 
 void ARMCharacterBase::InitAbilityActorInfo()
@@ -60,6 +57,47 @@ void ARMCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+void ARMCharacterBase::InitDefaultAttributes()
+{
+	if (AbilitySystemComponent && DefaultStatEffect)
+	{
+		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+		EffectContext.AddSourceObject(this);
+
+		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultStatEffect, 1.0f, EffectContext);
+		if (SpecHandle.IsValid())
+		{
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
+void ARMCharacterBase::HitDetection(const FRMSkillId& InSkillId)
+{
+
+}
+
+void ARMCharacterBase::HitReact()
+{
+	if (AbilitySystemComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is nullptr"));
+		return;
+	}
+
+	FGameplayTag HitReactTag = FGameplayTag::RequestGameplayTag(FName("Common.Combat.HitReact"));
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(HitReactTag);
+
+	bool result = AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
+}
+
+void ARMCharacterBase::ClearHitActors()
+{
+	HitActors.Empty();
 }
 
 UAbilitySystemComponent* ARMCharacterBase::GetAbilitySystemComponent() const

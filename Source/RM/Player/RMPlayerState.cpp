@@ -13,13 +13,3 @@ ARMPlayerState::ARMPlayerState()
 
 	AttributeSet = CreateDefaultSubobject<URMAttributeSet>("AttributeSet");
 }
-
-UAbilitySystemComponent* ARMPlayerState::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent;
-}
-
-UAttributeSet* ARMPlayerState::GetAttributeSet() const
-{
-	return AttributeSet;
-}

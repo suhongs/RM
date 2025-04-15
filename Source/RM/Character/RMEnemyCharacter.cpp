@@ -17,6 +17,17 @@ void ARMEnemyCharacter::PossessedBy(AController* NewController)
 
 	InitAbilityActorInfo();
 	InitDefaultAbility();
+	Super::InitDefaultAttributes();
+}
+
+void ARMEnemyCharacter::HitDetection(const FRMSkillId& InSkillId)
+{
+}
+
+void ARMEnemyCharacter::HitReact()
+{
+	Super::HitReact();
+
 }
 
 void ARMEnemyCharacter::BeginPlay()

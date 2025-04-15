@@ -23,6 +23,13 @@ public:
 
 protected:
 	virtual void InitAbilityActorInfo();
+
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual void HitDetection(const FRMSkillId& InSkillId) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void HitReact() override;
+
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
@@ -30,4 +37,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects/LightAttack")
+	TSubclassOf<UGameplayEffect> LightAttackEffect;
 };

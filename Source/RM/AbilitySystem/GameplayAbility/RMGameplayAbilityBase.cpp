@@ -4,6 +4,7 @@
 #include "AbilitySystem/GameplayAbility/RMGameplayAbilityBase.h"
 #include "AbilitySystemComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 
 void URMGameplayAbilityBase::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -14,7 +15,7 @@ void URMGameplayAbilityBase::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 	UAnimInstance* AnimInstance = ActorInfo->GetAnimInstance();
 
-	if (MontageToPlay != nullptr && AnimInstance != nullptr && AnimInstance->GetActiveMontageInstance() == nullptr)
+	if (MontageToPlay != nullptr && AnimInstance != nullptr)
 	{
 		TArray<FActiveGameplayEffectHandle>	AppliedEffects;
 
@@ -34,30 +35,39 @@ void URMGameplayAbilityBase::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 			}
 		}
 
-		UAbilitySystemComponent* AbilitySystemComponent = ActorInfo->AbilitySystemComponent.Get();
-		if (AbilitySystemComponent)
+		UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
+			this,   // Owning Ability
+			NAME_None, // Task Name (태그로 구분 가능)
+			MontageToPlay, // 재생할 애니메이션 몽타주
+			PlayRate,   // 플레이 속도
+			SectionName, // StartSectionName (특정 섹션에서 시작하려면 지정)
+			true,   // bStopWhenAbilityEnds (능력 종료 시 애니메이션 멈춤 여부)
+			1.0f     // AnimRootMotionTranslationScale (루트 모션 배율)
+		);
+
+		if (MontageTask)
 		{
-			float MontageDuration = AbilitySystemComponent->PlayMontage(this, ActivationInfo, MontageToPlay, PlayRate, SectionName);
+			MontageTask->OnCompleted.AddDynamic(this, &URMGameplayAbilityBase::OnEndAbility);
+			MontageTask->OnInterrupted.AddDynamic(this, &URMGameplayAbilityBase::OnEndAbility);
+			MontageTask->OnCancelled.AddDynamic(this, &URMGameplayAbilityBase::OnEndAbility);
 
-
-			if (MontageDuration > 0.f)
-			{
-				// Bind Montage End Delegate
-				FOnMontageEnded EndDelegate;
-				EndDelegate.BindUObject(this, &URMGameplayAbilityBase::OnMontageEnded, ActorInfo->AbilitySystemComponent, AppliedEffects);
-				AnimInstance->Montage_SetEndDelegate(EndDelegate, MontageToPlay);
-
-				if (SectionName != NAME_None)
-				{
-					AnimInstance->Montage_JumpToSection(SectionName, MontageToPlay);
-				}
-			}
+			MontageTask->ReadyForActivation();
 		}
+	}
+	else
+	{
+		OnEndAbility();
 	}
 }
 
-void URMGameplayAbilityBase::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted, TWeakObjectPtr<UAbilitySystemComponent> AbilitySystemComponent, TArray<struct FActiveGameplayEffectHandle> AppliedEffects)
+
+
+void URMGameplayAbilityBase::OnEndAbility()
 {
+	bool bReplicateEndAbility = false;
+	bool bWasCancelled = true;
+
+	Super::EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void URMGameplayAbilityBase::GetGameplayEffectsWhileAnimating(TArray<const UGameplayEffect*>& OutEffects) const

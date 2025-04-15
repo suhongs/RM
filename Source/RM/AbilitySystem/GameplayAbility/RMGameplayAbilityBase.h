@@ -35,13 +35,8 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Deprecated)
 	TArray<TObjectPtr<const UGameplayEffect>>	GameplayEffectsWhileAnimating;
 
-	//UFUNCTION(Server, Reliable)
-	//void ServerPlayMontage(UAnimMontage* Montage, float InPlayRate, FName StartSection);
-
-	//UFUNCTION(NetMulticast, Reliable)
-	//void MulticastPlayMontage(AActor* TargetActor, UAnimMontage* Montage, float InPlayRate, FName StartSection);
-
-	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted, TWeakObjectPtr<UAbilitySystemComponent> AbilitySystemComponent, TArray<struct FActiveGameplayEffectHandle>	AppliedEffects);
+	UFUNCTION()
+	virtual void OnEndAbility();
 
 	void GetGameplayEffectsWhileAnimating(TArray<const UGameplayEffect*>& OutEffects) const;
 	

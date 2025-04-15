@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/RMCharacterBase.h"
+#include "Interface/RMCombatInterface.h"
 #include "RMEnemyCharacter.generated.h"
 
 /**
@@ -24,7 +25,14 @@ public:
 
 	//UFUNCTION(BlueprintCallable)
 	//virtual void UnHighlightActor();
-	
+
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual void HitDetection(const FRMSkillId& InSkillId) override;
+	UFUNCTION(BlueprintCallable)
+	virtual void HitReact() override;
+
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;

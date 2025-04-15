@@ -7,7 +7,7 @@
 #include "GameFramework/PlayerState.h"
 #include "RMPlayerState.generated.h"
 
-class UAttributeSet;
+class URMAttributeSet;
 
 UCLASS()
 class RM_API ARMPlayerState : public APlayerState, public IAbilitySystemInterface
@@ -22,9 +22,8 @@ protected:
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
-	TObjectPtr<UAttributeSet> AttributeSet;
+	TObjectPtr<URMAttributeSet> AttributeSet;
 public:
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const;
-	UAttributeSet* GetAttributeSet() const;
-	
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
+	URMAttributeSet* GetAttributeSet() const { return AttributeSet; }
 };

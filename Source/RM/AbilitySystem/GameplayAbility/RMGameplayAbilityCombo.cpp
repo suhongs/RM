@@ -78,6 +78,8 @@ void URMGameplayAbilityCombo::ActivateAbility(const FGameplayAbilitySpecHandle H
 
 void URMGameplayAbilityCombo::OnEndAbility()
 {
+	RemoveAllComboWindowTag();
+
 	bool bReplicateEndAbility = false;
 	bool bWasCancelled = true;
 
@@ -110,6 +112,12 @@ void URMGameplayAbilityCombo::OnComboWindowOpen(FGameplayEventData Payload)
 
 void URMGameplayAbilityCombo::OnComboWindowEnd(FGameplayEventData Payload)
 {
+	RemoveAllComboWindowTag();
+	OnEndAbility();
+}
+
+void URMGameplayAbilityCombo::RemoveAllComboWindowTag()
+{
 	FGameplayAbilityActorInfo ActorInfo = GetActorInfo(); // 현재 Ability의 ActorInfo 가져오기
 	if (!ActorInfo.AbilitySystemComponent.IsValid())
 	{
@@ -125,6 +133,4 @@ void URMGameplayAbilityCombo::OnComboWindowEnd(FGameplayEventData Payload)
 			AbilitySystemComponent->RemoveLooseGameplayTag(CurrentComboWindowTag);
 		}
 	}
-
-	OnEndAbility();
 }

@@ -58,8 +58,14 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* HeavyAttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* RollAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	float LookSensitivity = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MovementVector", meta = (AllowPrivateAccess = "true"))
+	FVector2D MovementVector;
 protected:
 
 	void Move(const FInputActionValue& Value);
@@ -73,5 +79,7 @@ protected:
 	void LightAttack();
 
 	void HeavyAttack();
+
+	void Roll();
 
 };
