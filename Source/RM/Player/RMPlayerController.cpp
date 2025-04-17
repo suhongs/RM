@@ -7,7 +7,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "Character/RMCharacterBase.h"
+#include "Character/RMPlayerCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "CombatSystem/RMAimComponent.h"
 #include "HUD/RMHUD.h"
 
 ARMPlayerController::ARMPlayerController()
@@ -65,6 +67,8 @@ void ARMPlayerController::SetupInputComponent()
 		// Utilities
 		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Started, this, &ARMPlayerController::Roll);
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &ARMPlayerController::Dodge);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ARMPlayerController::Aim);
+
 
 	}
 }
@@ -267,4 +271,38 @@ void ARMPlayerController::Dodge()
 	TagContainer.AddTag(DodgeTag);
 
 	bool bSuccess = AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
+}
+
+void ARMPlayerController::Aim()
+{
+	if (AbilitySystemComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is nullptr"));
+		return;
+	}
+
+	FGameplayTag ModeTag = FGameplayTag::RequestGameplayTag(FName("Player.Mode"));
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(ModeTag);
+
+	bool result = AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
+
+
+	ARMPlayerCharacter* ControlledCharacter = Cast<ARMPlayerCharacter>(GetPawn());
+	if (result && !IsValid(ControlledCharacter))
+		return;
+
+	if (URMAimComponent* AimComponent = ControlledCharacter->GetAimComponent())
+	{
+		if (AimComponent->IsAiming())
+		{
+
+			AimComponent->ExitAimMode();
+		}
+		else
+		{
+			AimComponent->EnterAimMode();
+		}
+	}
 }

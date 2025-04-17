@@ -36,5 +36,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
+	TObjectPtr<class URMFloatingHpBarWidgetComponent> FloatingHpBarWidgetComponent;
 	
 };

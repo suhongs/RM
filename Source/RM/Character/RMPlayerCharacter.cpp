@@ -27,6 +27,8 @@ ARMPlayerCharacter::ARMPlayerCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerFollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+
+	AimComponent = CreateDefaultSubobject<URMAimComponent>(TEXT("AimComponent"));
 }
 
 void ARMPlayerCharacter::PossessedBy(AController* NewController)

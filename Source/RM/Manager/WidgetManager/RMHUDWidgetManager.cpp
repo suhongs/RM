@@ -10,8 +10,6 @@ void URMHUDWidgetManager::InitWidget()
 {
 	Super::InitWidget();
 
-
-	
 	//AttributeSet°ú Bind
 	BindCallbacksToDependencies();
 	BroadcastInitialValues();

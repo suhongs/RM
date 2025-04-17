@@ -8,6 +8,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class URMAimComponent;
 
 /**
  * 
@@ -25,6 +26,9 @@ protected:
 	virtual void InitAbilityActorInfo();
 
 public:
+	URMAimComponent* GetAimComponent() const { return AimComponent; }
+
+public:
 	UFUNCTION(BlueprintCallable)
 	virtual void HitDetection(const FRMSkillId& InSkillId) override;
 	UFUNCTION(BlueprintCallable)
@@ -37,6 +41,10 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+private:
+	UPROPERTY(VisibleAnywhere, Category = "Aim")
+	TObjectPtr<URMAimComponent> AimComponent;
 
 public:
 
