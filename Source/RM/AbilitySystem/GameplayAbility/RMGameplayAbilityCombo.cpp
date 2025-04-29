@@ -68,6 +68,7 @@ void URMGameplayAbilityCombo::ActivateAbility(const FGameplayAbilitySpecHandle H
 				MontageTask->OnCompleted.AddDynamic(this, &URMGameplayAbilityCombo::OnEndAbility);
 				MontageTask->OnInterrupted.AddDynamic(this, &URMGameplayAbilityCombo::OnEndAbility);
 				MontageTask->OnCancelled.AddDynamic(this, &URMGameplayAbilityCombo::OnEndAbility);
+				MontageTask->OnBlendOut.AddDynamic(this, &URMGameplayAbilityCombo::OnEndAbility);
 
 				MontageTask->ReadyForActivation();
 			}
@@ -83,12 +84,20 @@ void URMGameplayAbilityCombo::OnEndAbility()
 	bool bReplicateEndAbility = false;
 	bool bWasCancelled = true;
 
+	if (PrevComboWindowTag.IsValid())
+	{
+		if (auto ASC = GetAbilitySystemComponentFromActorInfo())
+		{
+			ASC->RemoveLooseGameplayTag(PrevComboWindowTag);
+		}
+	}
+
 	Super::EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void URMGameplayAbilityCombo::OnComboWindowOpen(FGameplayEventData Payload)
 {
-	FGameplayAbilityActorInfo ActorInfo = GetActorInfo(); // 현재 Ability의 ActorInfo 가져오기
+	FGameplayAbilityActorInfo ActorInfo = GetActorInfo();
 	if (!ActorInfo.AbilitySystemComponent.IsValid())
 	{
 		return;
@@ -118,7 +127,7 @@ void URMGameplayAbilityCombo::OnComboWindowEnd(FGameplayEventData Payload)
 
 void URMGameplayAbilityCombo::RemoveAllComboWindowTag()
 {
-	FGameplayAbilityActorInfo ActorInfo = GetActorInfo(); // 현재 Ability의 ActorInfo 가져오기
+	FGameplayAbilityActorInfo ActorInfo = GetActorInfo();
 	if (!ActorInfo.AbilitySystemComponent.IsValid())
 	{
 		return;

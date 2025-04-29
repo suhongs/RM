@@ -9,7 +9,7 @@
 
 URMAimComponent::URMAimComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true; // Tick 활성화
 }
 
 void URMAimComponent::BeginPlay()
@@ -34,6 +34,11 @@ void URMAimComponent::BeginPlay()
 
 	DefaultCameraBoomLocation = CameraBoom->SocketOffset;
 	DefaultTargetArmLength = CameraBoom->TargetArmLength;
+
+	// 초기 목표값은 현재 값
+	TargetSocketOffset = CameraBoom->SocketOffset;
+	TargetArmLength = CameraBoom->TargetArmLength;
+	TargetFOV = FollowCamera->FieldOfView;
 }
 
 void URMAimComponent::EnterAimMode()
@@ -42,20 +47,20 @@ void URMAimComponent::EnterAimMode()
 		return;
 
 	if (!IsValid(OwnerCharacter))
-	{
 		return;
-	}
 
 	AlignToCamera(true);
-
 	bIsAiming = true;
+	bWantsToAim = true;
 
-	// 카메라 설정 변경
-	CameraBoom->SocketOffset = AimOffset;
-	CameraBoom->TargetArmLength = AimTargetArmLength;
-	FollowCamera->SetFieldOfView(AimCameraFOV);
+	TargetSocketOffset = AimOffset;
+	TargetArmLength = AimTargetArmLength;
+	TargetFOV = AimCameraFOV;
 
-	// TODO: 에임 UI On
+	if (OnEnterAimMode.IsBound())
+	{
+		OnEnterAimMode.Broadcast();
+	}
 }
 
 void URMAimComponent::ExitAimMode()
@@ -65,33 +70,41 @@ void URMAimComponent::ExitAimMode()
 
 	AlignToCamera(false);
 	bIsAiming = false;
+	bWantsToAim = false;
 
-	// 원래대로 복귀
-	CameraBoom->SocketOffset = DefaultCameraBoomLocation;
-	CameraBoom->TargetArmLength = DefaultTargetArmLength;
-	FollowCamera->SetFieldOfView(NormalCameraFOV);
+	TargetSocketOffset = DefaultCameraBoomLocation;
+	TargetArmLength = DefaultTargetArmLength;
+	TargetFOV = NormalCameraFOV;
 
-	// TODO: 에임 UI Off
+	if (OnExitAimMode.IsBound())
+	{
+		OnExitAimMode.Broadcast();
+	}
+}
+
+void URMAimComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (!CameraBoom || !FollowCamera)
+		return;
+
+	CameraBoom->SocketOffset = FMath::VInterpTo(CameraBoom->SocketOffset, TargetSocketOffset, DeltaTime, InterpSpeed);
+	CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetArmLength, DeltaTime, InterpSpeed);
+
+	float CurrentFOV = FollowCamera->FieldOfView;
+	float NewFOV = FMath::FInterpTo(CurrentFOV, TargetFOV, DeltaTime, FOVInterpSpeed);
+	FollowCamera->SetFieldOfView(NewFOV);
 }
 
 void URMAimComponent::AlignToCamera(bool InIsAlign)
 {
 	if (!IsValid(OwnerCharacter))
-	{
 		return;
-	}
 
 	if (UCharacterMovementComponent* MovementComponent = OwnerCharacter->GetCharacterMovement())
 	{
-		if (InIsAlign)
-		{
-			MovementComponent->MaxWalkSpeed = 200;
-		}
-		else
-		{
-			MovementComponent->MaxWalkSpeed = 600;
-		}
-
+		MovementComponent->MaxWalkSpeed = InIsAlign ? 200.f : 600.f;
 		OwnerCharacter->bUseControllerRotationYaw = InIsAlign;
 		MovementComponent->bOrientRotationToMovement = !InIsAlign;
 	}

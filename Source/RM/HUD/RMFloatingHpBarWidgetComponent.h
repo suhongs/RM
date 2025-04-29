@@ -21,10 +21,12 @@ class RM_API URMFloatingHpBarWidgetComponent : public UWidgetComponent
 public:
 	virtual void BeginPlay() override;
 	void InitFloatingWidgetComponent(URMAttributeSet* AttributeSet);
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Widget")
 	TSubclassOf<URMFloatingHpBarWidget> FloatingWidgetClass;
 
+	UPROPERTY()
 	TObjectPtr<URMFloatingHpBarWidget> FloatingWidget;
 };

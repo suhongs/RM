@@ -4,20 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "Manager/RMWidgetManagerBase.h"
-#include "RMHUDWidgetManager.generated.h"
+#include "RMCrosshairWidgetManager.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RM_API URMHUDWidgetManager : public URMWidgetManagerBase
+class RM_API URMCrosshairWidgetManager : public URMWidgetManagerBase
 {
 	GENERATED_BODY()
 	
-	
 public:
 	virtual void InitWidget() override;
-
+	
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
 };

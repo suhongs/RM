@@ -50,6 +50,7 @@ void URMGameplayAbilityBase::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 			MontageTask->OnCompleted.AddDynamic(this, &URMGameplayAbilityBase::OnEndAbility);
 			MontageTask->OnInterrupted.AddDynamic(this, &URMGameplayAbilityBase::OnEndAbility);
 			MontageTask->OnCancelled.AddDynamic(this, &URMGameplayAbilityBase::OnEndAbility);
+			MontageTask->OnBlendOut.AddDynamic(this, &URMGameplayAbilityBase::OnEndAbility);
 
 			MontageTask->ReadyForActivation();
 		}
