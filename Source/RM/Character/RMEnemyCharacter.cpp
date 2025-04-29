@@ -5,15 +5,19 @@
 #include "HUD/RMFloatingHpBarWidgetComponent.h"
 #include "AbilitySystem/RMAbilitySystemComponent.h"
 #include "AbilitySystem/RMAttributeSet.h"
+#include "HUD/RMInbodyCursorWidgetComponent.h"
 
 ARMEnemyCharacter::ARMEnemyCharacter()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<URMAbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSet = CreateDefaultSubobject<URMAttributeSet>("AttributeSet");
 
-	FloatingHpBarWidgetComponent = CreateDefaultSubobject<URMFloatingHpBarWidgetComponent>(TEXT("FloatingHpBarWidget"));
-	FloatingHpBarWidgetComponent->SetupAttachment(RootComponent); // 루트에 부착
-	FloatingHpBarWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 120.f)); // 캐릭터 머리 위로 이동 (필요시 조절)
+	FloatingHealthBarWidgetComponent = CreateDefaultSubobject<URMFloatingHpBarWidgetComponent>(TEXT("FloatingHpBarWidgetComponent"));
+	FloatingHealthBarWidgetComponent->SetupAttachment(RootComponent); // 루트에 부착
+	FloatingHealthBarWidgetComponent->SetRelativeLocation(FVector(0.f, 0.f, 120.f)); // 캐릭터 머리 위로 이동 (필요시 조절)
+
+	InbodyCursorWidgetComponent = CreateDefaultSubobject<URMInbodyCursorWidgetComponent>(TEXT("InbodyCursorWidgetComponent"));
+	InbodyCursorWidgetComponent->SetupAttachment(RootComponent);
 }
 
 void ARMEnemyCharacter::PossessedBy(AController* NewController)
@@ -39,9 +43,9 @@ void ARMEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (FloatingHpBarWidgetComponent && AttributeSet)
+	if (FloatingHealthBarWidgetComponent && AttributeSet)
 	{
-		FloatingHpBarWidgetComponent->InitFloatingWidgetComponent(AttributeSet);
+		FloatingHealthBarWidgetComponent->InitFloatingWidgetComponent(AttributeSet);
 	}
 }
 
@@ -51,4 +55,20 @@ void ARMEnemyCharacter::InitAbilityActorInfo()
 		return;
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+}
+
+void ARMEnemyCharacter::ShowInbodyCursor()
+{
+	if (IsValid(InbodyCursorWidgetComponent))
+	{
+		InbodyCursorWidgetComponent->SetVisibility(true);
+	}
+}
+
+void ARMEnemyCharacter::HideInbodyCursor()
+{
+	if (IsValid(InbodyCursorWidgetComponent))
+	{
+		InbodyCursorWidgetComponent->SetVisibility(false);
+	}
 }

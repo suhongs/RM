@@ -12,6 +12,7 @@ class URMAbilitySystemComponent;
 class URMAttributeSet;
 class UGameplayAbility;
 class UGameplayEffect;
+class URMLockOnSystemComponent;
 
 UCLASS()
 class RM_API ARMCharacterBase : public ACharacter, public IAbilitySystemInterface, public IRMCombatInterface
@@ -44,6 +45,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "LockOn", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URMLockOnSystemComponent> LockOnSystemComponent;
+
 	UPROPERTY()
 	TObjectPtr<URMAttributeSet> AttributeSet;
 
@@ -71,6 +75,7 @@ protected:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	URMAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	URMLockOnSystemComponent* GetLockOnSystemComponent() const { return LockOnSystemComponent; }
 
 	
 };

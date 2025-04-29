@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "Character/RMCharacterBase.h"
 #include "Interface/RMCombatInterface.h"
+#include "Interface/RMLockOnTargetInterface.h"
 #include "RMEnemyCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RM_API ARMEnemyCharacter : public ARMCharacterBase
+class RM_API ARMEnemyCharacter : public ARMCharacterBase , public IRMLockOnTargetInterface
 {
 	GENERATED_BODY()
 	
@@ -39,6 +40,12 @@ protected:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
-	TObjectPtr<class URMFloatingHpBarWidgetComponent> FloatingHpBarWidgetComponent;
+	TObjectPtr<class URMFloatingHpBarWidgetComponent> FloatingHealthBarWidgetComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
+	TObjectPtr<class URMInbodyCursorWidgetComponent> InbodyCursorWidgetComponent;
+public:
+	virtual void ShowInbodyCursor() override;
+	virtual void HideInbodyCursor() override;
 	
 };

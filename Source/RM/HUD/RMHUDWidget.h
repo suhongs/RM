@@ -15,6 +15,14 @@ class RM_API URMHUDWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+
+	virtual void NativeOnInitialized() override;
+
+	void SetHealth(float Current, float Max);
+	void SetMana(float Current, float Max);
+
+public:
+
 	// 체력/마나 ProgressBar
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> PB_Health;
@@ -29,8 +37,4 @@ public:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<class UTextBlock> TXT_Mana;
 
-	virtual void NativeOnInitialized() override;
-
-	void SetHealth(float Current, float Max);
-	void SetMana(float Current, float Max);
 };

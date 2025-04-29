@@ -30,6 +30,12 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<URMHUDWidgetManager> HUDWidgetManager;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Widget")
+	TSubclassOf<URMWidgetManagerBase> CrosshairWidgetManagerClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<URMWidgetManagerBase> CrosshairWidgetManager;
 	
 	/*인벤토리 제작 후 InventoryWidgetManager 선언
 	UPROPERTY(BlueprintReadWrite)

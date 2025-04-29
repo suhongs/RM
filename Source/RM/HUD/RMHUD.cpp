@@ -4,6 +4,7 @@
 #include "HUD/RMHUD.h"
 #include "Blueprint/UserWidget.h"
 #include "Manager/WidgetManager/RMHUDWidgetManager.h"
+#include "Manager/WidgetManager/RMCrosshairWidgetManager.h"
 
 void ARMHUD::BeginPlay()
 {
@@ -20,5 +21,12 @@ void ARMHUD::InitHUD(APlayerController* InPC, APlayerState* InPS, ARMCharacterBa
 		HUDWidgetManager = NewObject<URMHUDWidgetManager>(this, HUDWidgetManagerClass);
 		HUDWidgetManager->SetWidgetManagerParams(WidgetManagerParams);
 		HUDWidgetManager->InitWidget();
+	}
+
+	if (CrosshairWidgetManagerClass)
+	{
+		CrosshairWidgetManager = NewObject<URMCrosshairWidgetManager>(this, CrosshairWidgetManagerClass);
+		CrosshairWidgetManager->SetWidgetManagerParams(WidgetManagerParams);
+		CrosshairWidgetManager->InitWidget();
 	}
 }

@@ -7,6 +7,19 @@
 #include "Engine/DataTable.h"
 #include "RMDataManagerSubsystem.generated.h"
 
+USTRUCT(BlueprintType)
+struct FTableLoadInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+	FName Id;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data Table")
+	FString Path;
+};
+
+
 UCLASS()
 class RM_API URMDataManagerSubsystem : public UGameInstanceSubsystem
 {
@@ -22,4 +35,6 @@ private:
 	TMap<FName, TObjectPtr<UDataTable>> CachedTables;
 
 	void LoadAllDataTables();
+
+	//void OnDataTableLoaded(const FTableLoadInfo& TableInfo);
 };
