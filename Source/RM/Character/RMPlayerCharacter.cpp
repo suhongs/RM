@@ -9,7 +9,9 @@
 #include "Player/RMPlayerState.h"
 #include "AbilitySystem/RMAbilitySystemComponent.h"
 #include "Subsystem/HitProcessingSubsystem.h"
+#include "CombatSystem/RMLockOnSystemComponent.h"
 
+#include "Projectile/RMProjectileBase.h"
 
 // For Debug
 #include "DrawDebugHelpers.h"
@@ -22,6 +24,8 @@ ARMPlayerCharacter::ARMPlayerCharacter()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraBoom->SocketOffset = FVector(0.f, 0.f, 100.f);
+	CameraBoom->SetRelativeRotation(FRotator(-15.f, 0.f, 0.f));
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerFollowCamera"));
@@ -57,82 +61,7 @@ void ARMPlayerCharacter::InitAbilityActorInfo()
 
 void ARMPlayerCharacter::HitDetection(const FRMSkillId& InSkillId)
 {
-
-	TArray<UStaticMeshComponent*> StaticMeshComponents;
-	GetComponents<UStaticMeshComponent>(StaticMeshComponents);
-	UStaticMeshComponent* Spear = nullptr;
-
-	// StaticMeshComponent 배열에서 Spear 찾기
-	for (UStaticMeshComponent* Component : StaticMeshComponents)
-	{
-		if (Component && Component->GetName() == TEXT("Spear"))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Spear found!"));
-			Spear = Component;
-			break;
-		}
-	}
-
-
-	if (Spear == nullptr)
-		return;
-
-	FVector Start = Spear->GetSocketLocation("Start");
-	FVector End = Spear->GetSocketLocation("End");
-	float SphereRadius = 15.0f; // 구체의 반경
-
-	// 충돌 결과를 저장할 HitResult
-	FHitResult HitResult;
-
-	// 트레이스에 사용할 쿼리 파라미터
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this); // 자기 자신을 무시
-
-	// 충돌 형태 설정 (Sphere)
-	FCollisionShape CollisionShape;
-	CollisionShape.SetSphere(SphereRadius);
-
-	// 검사할 객체 타입 설정 (Pawn만 검사)
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_Pawn));
-
-	bool bHit = UKismetSystemLibrary::SphereTraceSingleForObjects(
-		this,                               // 월드 컨텍스트 객체
-		Start,                              // 트레이스 시작 지점
-		End,                                // 트레이스 끝 지점
-		SphereRadius,                       // 트레이스 구체의 반경
-		ObjectTypes,                        // 검사할 객체 타입
-		false,                              // 복잡한 충돌을 검사하지 않음
-		TArray<AActor*>(),                  // 무시할 액터들
-		EDrawDebugTrace::ForDuration,       // 디버깅용으로 일정 시간 동안 트레이스를 그리기
-		HitResult,                          // 충돌 결과 저장
-		true,                               // 자기 자신 무시
-		FLinearColor::Red,                  // 트레이스 색상
-		FLinearColor::Green,                // 충돌 색상
-		2.0f                                // 디버그 표시 시간
-	);
-
-	UHitProcessingSubsystem* HitProcessingSubsystem = GetGameInstance()->GetSubsystem<UHitProcessingSubsystem>();
-	if (HitProcessingSubsystem == nullptr)
-		return;
-
-	if (bHit && HitResult.GetActor() != nullptr)
-	{
-		AActor* HitActor = HitResult.GetActor();
-		ARMCharacterBase* HitCharacter = Cast<ARMCharacterBase>(HitActor);
-
-		IRMCombatInterface* CombatInterface = Cast<IRMCombatInterface>(HitActor);
-
-		if (HitCharacter && CombatInterface && !HitActors.Contains(HitActor))
-		{
-			// 충돌된 적을 목록에 추가하고, 대미지 입히기
-			HitActors.Add(HitActor);
-
-			HitProcessingSubsystem->ProcessHit(this, HitCharacter, InSkillId);
-
-			CombatInterface->HitReact();
-		}
-	}
+	Super::HitDetection(InSkillId);
 }
 
 void ARMPlayerCharacter::HitReact()
@@ -140,13 +69,79 @@ void ARMPlayerCharacter::HitReact()
 	Super::HitReact();
 }
 
+void ARMPlayerCharacter::ThrowSpear()
+{
+	TArray<USceneComponent*> SceneComponents;
+	GetComponents<USceneComponent>(SceneComponents);
+	USceneComponent* Weapon = nullptr;
+
+	for (USceneComponent* Component : SceneComponents)
+	{
+		if (Component && Component->GetName() == TEXT("Weapon"))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Weapon found!"));
+			Weapon = Component;
+			break;
+		}
+	}
+
+	if (!ProjectileClass || !Weapon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ProjectileClass or Weapon is missing!"));
+		return;
+	}
+
+	// 카메라 기준 라인트레이스 (크로스헤어 방향)
+	FVector TraceStart = FollowCamera->GetComponentLocation();
+	FVector TraceDirection = FollowCamera->GetForwardVector();
+	FVector TraceEnd = TraceStart + TraceDirection * 10000.f;
+
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	bool bHit = GetWorld()->LineTraceSingleByChannel(
+		Hit, TraceStart, TraceEnd, ECC_Visibility, Params
+	);
+
+	FVector TargetLocation = bHit ? Hit.ImpactPoint : TraceEnd;
+
+	// 크로스헤어 방향으로 던지기 위한 방향
+	FVector AimDirection = (TargetLocation - TraceStart).GetSafeNormal();
+	FRotator ProjectileRotation = AimDirection.Rotation();
+
+	// 스폰 위치는 Weapon 위치
+	FVector SpawnLocation = Weapon->GetComponentLocation();
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	// 투사체 생성
+	ARMProjectileBase* Projectile = GetWorld()->SpawnActor<ARMProjectileBase>(
+		ProjectileClass,
+		SpawnLocation,
+		ProjectileRotation,
+		SpawnParams
+	);
+
+	if (Projectile)
+	{
+		Projectile->InitProjectile(this, 3);
+		Projectile->InitVelocity(AimDirection);
+	}
+
+}
+
 void ARMPlayerCharacter::RotateCharacterToCameraYaw()
 {
-	if (Controller)
+	if (!IsValid(LockOnSystemComponent))
+		return;
+
+	if (LockOnSystemComponent->IsLockedOn() && LockOnSystemComponent->LockedTarget)
 	{
-		// 카메라 방향 기준으로 캐릭터 회전
-		const FRotator ControlRot = Controller->GetControlRotation();
-		const FRotator NewYawRot(0.f, ControlRot.Yaw, 0.f); // Pitch, Roll 제거하고 Yaw만 사용
-		SetActorRotation(NewYawRot); // 이걸로 공격 방향이 카메라 방향이 됨
+		const FVector Direction = (LockOnSystemComponent->LockedTarget->GetActorLocation() - Owner->GetActorLocation()).GetSafeNormal();
+		FRotator CurrentRotation = Owner->GetActorRotation();
+		float TargetYaw = Direction.Rotation().Yaw;
+		FRotator NewRotation(CurrentRotation.Pitch, TargetYaw, CurrentRotation.Roll);
 	}
 }

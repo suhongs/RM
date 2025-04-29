@@ -10,6 +10,7 @@
 #include "Character/RMPlayerCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "CombatSystem/RMAimComponent.h"
+#include "CombatSystem/RMLockOnSystemComponent.h"
 #include "HUD/RMHUD.h"
 
 ARMPlayerController::ARMPlayerController()
@@ -69,7 +70,10 @@ void ARMPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &ARMPlayerController::Dodge);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ARMPlayerController::Aim);
 
-
+		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Started, this, &ARMPlayerController::LockOnStart);
+		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Completed, this, &ARMPlayerController::LockOnStop);
+		EnhancedInputComponent->BindAction(LockOnNextTargetAction, ETriggerEvent::Started, this, &ARMPlayerController::LockOnNextTarget);
+		EnhancedInputComponent->BindAction(LockOnPrevTargetAction, ETriggerEvent::Started, this, &ARMPlayerController::LockOnPrevTarget);
 	}
 }
 
@@ -290,7 +294,7 @@ void ARMPlayerController::Aim()
 
 
 	ARMPlayerCharacter* ControlledCharacter = Cast<ARMPlayerCharacter>(GetPawn());
-	if (result && !IsValid(ControlledCharacter))
+	if (!result || !IsValid(ControlledCharacter))
 		return;
 
 	if (URMAimComponent* AimComponent = ControlledCharacter->GetAimComponent())
@@ -305,4 +309,56 @@ void ARMPlayerController::Aim()
 			AimComponent->EnterAimMode();
 		}
 	}
+}
+
+void ARMPlayerController::LockOnStart()
+{
+	ARMPlayerCharacter* ControlledCharacter = Cast<ARMPlayerCharacter>(GetPawn());
+	if (!IsValid(ControlledCharacter))
+		return;
+
+	URMLockOnSystemComponent* LSC = ControlledCharacter->GetLockOnSystemComponent();
+	if (!IsValid(LSC))
+		return;
+
+	LSC->LockOn();
+}
+
+void ARMPlayerController::LockOnStop()
+{
+	ARMPlayerCharacter* ControlledCharacter = Cast<ARMPlayerCharacter>(GetPawn());
+	if (!IsValid(ControlledCharacter))
+		return;
+
+	URMLockOnSystemComponent* LSC = ControlledCharacter->GetLockOnSystemComponent();
+	if (!IsValid(LSC))
+		return;
+
+	LSC->Unlock();
+}
+
+void ARMPlayerController::LockOnNextTarget()
+{
+	ARMPlayerCharacter* ControlledCharacter = Cast<ARMPlayerCharacter>(GetPawn());
+	if (!IsValid(ControlledCharacter))
+		return;
+
+	URMLockOnSystemComponent* LSC = ControlledCharacter->GetLockOnSystemComponent();
+	if (!IsValid(LSC))
+		return;
+
+	LSC->LockOnNextTarget();
+}
+
+void ARMPlayerController::LockOnPrevTarget()
+{
+	ARMPlayerCharacter* ControlledCharacter = Cast<ARMPlayerCharacter>(GetPawn());
+	if (!IsValid(ControlledCharacter))
+		return;
+
+	URMLockOnSystemComponent* LSC = ControlledCharacter->GetLockOnSystemComponent();
+	if (!IsValid(LSC))
+		return;
+
+	LSC->LockOnPrevTarget();
 }

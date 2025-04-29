@@ -28,12 +28,16 @@ protected:
 public:
 	URMAimComponent* GetAimComponent() const { return AimComponent; }
 
+	UFUNCTION(BlueprintCallable)
+	void RotateCharacterToCameraYaw();
+
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void HitDetection(const FRMSkillId& InSkillId) override;
 	UFUNCTION(BlueprintCallable)
 	virtual void HitReact() override;
-
+	UFUNCTION(BlueprintCallable)
+	void ThrowSpear();
 	
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
@@ -41,6 +45,14 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpearMesh", meta = (AllowPrivateAccess = "true"))
+	class UStaticMesh* SpearMesh;
+
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpearMesh", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class ARMProjectileBase> ProjectileClass;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Aim")
@@ -51,7 +63,4 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects/LightAttack")
 	TSubclassOf<UGameplayEffect> LightAttackEffect;
 
-public:
-	UFUNCTION(BlueprintCallable)
-	void RotateCharacterToCameraYaw();
 };
