@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Manager/RMWidgetManagerBase.h"
+#include "GameplayEffectTypes.h"
 #include "RMHUDWidgetManager.generated.h"
 
 /**
@@ -20,4 +21,9 @@ public:
 
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
+
+public:
+	void SetHealthProgressBar(const FOnAttributeChangeData& Data);
+	
+	void SetManaProgressBar(const FOnAttributeChangeData& Data);
 };

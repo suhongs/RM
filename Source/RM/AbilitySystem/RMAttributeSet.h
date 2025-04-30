@@ -16,6 +16,7 @@
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedDelegate, float, float);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnManaChangedDelegate, float, float);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEffectExecuted, const FGameplayEffectModCallbackData&)
 
 UCLASS()
 class RM_API URMAttributeSet : public UAttributeSet
@@ -24,6 +25,10 @@ class RM_API URMAttributeSet : public UAttributeSet
 
 public:
 	URMAttributeSet();
+
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+public:
 
 	// ========== Health ==========
 	UPROPERTY(BlueprintReadOnly, Category = "Attribute|Health")
@@ -56,5 +61,6 @@ public:
 	FOnHealthChangedDelegate OnHealthChanged;
 	FOnManaChangedDelegate OnManaChanged;
 
-	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
+	FOnEffectExecuted OnEffectExecuted;
+
 };

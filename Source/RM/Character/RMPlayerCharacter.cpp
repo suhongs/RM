@@ -126,7 +126,7 @@ void ARMPlayerCharacter::ThrowSpear()
 
 	if (Projectile)
 	{
-		Projectile->InitProjectile(this, 3);
+		Projectile->InitProjectile(this);
 		Projectile->InitVelocity(AimDirection);
 	}
 

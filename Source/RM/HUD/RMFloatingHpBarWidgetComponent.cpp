@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "HUD/RMFloatingHpBarWidget.h"
 #include "AbilitySystem/RMAttributeSet.h"
+#include "AbilitySystem/RMAbilitySystemComponent.h"
 
 void URMFloatingHpBarWidgetComponent::BeginPlay()
 {
@@ -25,16 +26,37 @@ void URMFloatingHpBarWidgetComponent::BeginPlay()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void URMFloatingHpBarWidgetComponent::InitFloatingWidgetComponent(URMAttributeSet* AttributeSet)
+void URMFloatingHpBarWidgetComponent::InitFloatingWidgetComponent(UAbilitySystemComponent* InAbilitySystemComponent, URMAttributeSet* InAttributeSet)
 {
-	if (IsValid(AttributeSet) == false)
+	if (IsValid(InAttributeSet))
+	{
+		AttributeSet = InAttributeSet;
+	}
+
+	if (!IsValid(FloatingWidget))
 		return;
 
-	if (FloatingWidget == nullptr)
+	if (!IsValid(InAbilitySystemComponent))
 		return;
+
+	InAbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &URMFloatingHpBarWidgetComponent::SetHealthProgressBar);
 
 	AttributeSet->OnHealthChanged.AddUObject(FloatingWidget, &URMFloatingHpBarWidget::SetHealth);
 	FloatingWidget->SetHealth(AttributeSet->GetCurrentHealth(), AttributeSet->GetMaxHealth());
+}
+
+void URMFloatingHpBarWidgetComponent::SetHealthProgressBar(const FOnAttributeChangeData& Data)
+{
+
+	if (!IsValid(AttributeSet))
+	{
+		return;
+	}
+
+	if (!IsValid(FloatingWidget))
+		return;
+
+	FloatingWidget->SetHealth(Data.NewValue, AttributeSet->GetMaxHealth());
 }
 
 void URMFloatingHpBarWidgetComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -45,10 +45,9 @@ void ARMProjectileBase::Tick(float DeltaTime)
 
 }
 
-void ARMProjectileBase::InitProjectile(ARMCharacterBase* InOnwer, const FRMSkillId& InSkillId)
+void ARMProjectileBase::InitProjectile(ARMCharacterBase* InOnwer)
 {
 	OwnerCharacter = InOnwer;
-	SkillId = InSkillId;
 }
 
 void ARMProjectileBase::InitVelocity(FVector Direction)

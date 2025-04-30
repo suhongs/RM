@@ -6,6 +6,7 @@
 #include "AbilitySystem/RMAbilitySystemComponent.h"
 #include "AbilitySystem/RMAttributeSet.h"
 #include "HUD/RMInbodyCursorWidgetComponent.h"
+#include "Subsystem/RMFloatingDamageSubsystem.h"
 
 ARMEnemyCharacter::ARMEnemyCharacter()
 {
@@ -43,10 +44,18 @@ void ARMEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (FloatingHealthBarWidgetComponent && AttributeSet)
+	if (FloatingHealthBarWidgetComponent && AttributeSet && AbilitySystemComponent)
 	{
-		FloatingHealthBarWidgetComponent->InitFloatingWidgetComponent(AttributeSet);
+		FloatingHealthBarWidgetComponent->InitFloatingWidgetComponent(AbilitySystemComponent, AttributeSet);
 	}
+
+	URMFloatingDamageSubsystem* FloatingDamageSubsystem = GetGameInstance()->GetSubsystem<URMFloatingDamageSubsystem>();
+	if (IsValid(FloatingDamageSubsystem))
+	{
+		FloatingDamageSubsystem->RegisterWithAbilitySystem(this);
+	}
+
+
 }
 
 void ARMEnemyCharacter::InitAbilityActorInfo()

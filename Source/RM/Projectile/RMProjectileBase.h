@@ -29,7 +29,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-    void InitProjectile(ARMCharacterBase* InOnwer, const FRMSkillId& InSkillId);
+    void InitProjectile(ARMCharacterBase* InOnwer);
     void InitVelocity(FVector Direction);
 
     UFUNCTION()

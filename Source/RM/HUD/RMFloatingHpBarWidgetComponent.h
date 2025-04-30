@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/WidgetComponent.h"
+
 #include "RMFloatingHpBarWidgetComponent.generated.h"
 
 /**
@@ -11,6 +12,7 @@
  */
 
 class URMAttributeSet;
+class UAbilitySystemComponent;
 class URMFloatingHpBarWidget;
 
 UCLASS()
@@ -20,8 +22,13 @@ class RM_API URMFloatingHpBarWidgetComponent : public UWidgetComponent
 	
 public:
 	virtual void BeginPlay() override;
-	void InitFloatingWidgetComponent(URMAttributeSet* AttributeSet);
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+public:
+	void InitFloatingWidgetComponent(UAbilitySystemComponent* AbilitySystemComponent, URMAttributeSet* AttributeSet);
+
+	void SetHealthProgressBar(const struct FOnAttributeChangeData& Data);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Widget")
@@ -29,4 +36,8 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<URMFloatingHpBarWidget> FloatingWidget;
+
+private:
+	UPROPERTY()
+	TObjectPtr<URMAttributeSet> AttributeSet;
 };

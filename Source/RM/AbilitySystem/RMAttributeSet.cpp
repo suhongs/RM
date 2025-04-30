@@ -2,6 +2,7 @@
 
 
 #include "AbilitySystem/RMAttributeSet.h"
+#include "GameplayEffectExtension.h"
 
 URMAttributeSet::URMAttributeSet()
 {
@@ -19,4 +20,16 @@ void URMAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, f
 	{
 		OnManaChanged.Broadcast(NewValue, GetMaxMana());
 	}
+}
+
+void URMAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+{
+	if (Data.EvaluatedData.Attribute == GetCurrentHealthAttribute())
+	{
+		if (OnEffectExecuted.IsBound())
+		{
+			OnEffectExecuted.Broadcast(Data);
+		}
+	}
+	
 }

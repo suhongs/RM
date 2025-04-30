@@ -5,6 +5,7 @@
 #include "HUD/RMHUDWidget.h"
 #include "Character/RMCharacterBase.h"
 #include "AbilitySystem/RMAttributeSet.h"
+#include "AbilitySystem/RMAbilitySystemComponent.h"
 
 void URMHUDWidgetManager::InitWidget()
 {
@@ -59,10 +60,60 @@ void URMHUDWidgetManager::BindCallbacksToDependencies()
 		return;
 	}
 
+	if (!IsValid(AbilitySystemComponent))
+	{
+		return;
+	}
+
 	if (URMHUDWidget* HUDWidget = Cast<URMHUDWidget>(Widget))
 	{
-		AttributeSet->OnHealthChanged.AddUObject(HUDWidget, &URMHUDWidget::SetHealth);
-		AttributeSet->OnManaChanged.AddUObject(HUDWidget, &URMHUDWidget::SetMana);
+
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentHealthAttribute()).AddUObject(this, &URMHUDWidgetManager::SetHealthProgressBar);
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentManaAttribute()).AddUObject(this, &URMHUDWidgetManager::SetManaProgressBar);
+
+
+		//AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentHealthAttribute()).AddLambda()
+		//AttributeSet->OnHealthChanged.AddUObject(HUDWidget, &URMHUDWidget::SetHealth);
+		//AttributeSet->OnManaChanged.AddUObject(HUDWidget, &URMHUDWidget::SetMana);
 	}	
 	
 }
+
+void URMHUDWidgetManager::SetHealthProgressBar(const FOnAttributeChangeData& Data)
+{
+	URMAttributeSet* AttributeSet = Pawn->GetAttributeSet();
+	if (AttributeSet == nullptr)
+	{
+		return;
+	}
+
+	if (Widget == nullptr)
+	{
+		return;
+	}
+
+	if (URMHUDWidget* HUDWidget = Cast<URMHUDWidget>(Widget))
+	{
+		HUDWidget->SetHealth(Data.NewValue, AttributeSet->GetMaxHealth());
+	}
+}
+
+void URMHUDWidgetManager::SetManaProgressBar(const FOnAttributeChangeData& Data)
+{
+	URMAttributeSet* AttributeSet = Pawn->GetAttributeSet();
+	if (AttributeSet == nullptr)
+	{
+		return;
+	}
+
+	if (Widget == nullptr)
+	{
+		return;
+	}
+
+	if (URMHUDWidget* HUDWidget = Cast<URMHUDWidget>(Widget))
+	{
+		HUDWidget->SetMana(Data.NewValue, AttributeSet->GetMaxMana());
+	}
+}
+
