@@ -27,7 +27,6 @@ void URMFloatingDamageSubsystem::Initialize(FSubsystemCollectionBase& Collection
 
 	WidgetPool = NewObject<URMObjectPool>(GetWorld(), TEXT("WidgetPool"));
 
-	
 	WidgetPool->InitializePool(FloatingDamageActorClass);
 }
 
