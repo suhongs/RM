@@ -131,10 +131,11 @@ void URMLockOnSystemComponent::RotateTowardTarget(float DeltaTime)
 	const FVector Direction = (LockedTarget->GetActorLocation() - Owner->GetActorLocation()).GetSafeNormal();
 	FRotator CurrentRotation = Owner->GetActorRotation();
 	float TargetYaw = Direction.Rotation().Yaw;
+
 	float NewYaw = FMath::FInterpTo(CurrentRotation.Yaw, TargetYaw, DeltaTime, RotationSpeed);
 	FRotator NewRotation(CurrentRotation.Pitch, NewYaw, CurrentRotation.Roll);
-
 	Owner->SetActorRotation(NewRotation);
+
 	AdjustCameraRotation(DeltaTime, Direction, Owner);
 }
 
@@ -212,13 +213,17 @@ void URMLockOnSystemComponent::AdjustCameraRotation(float DeltaTime, const FVect
 			FRotator CurrentControlRotation = PC->GetControlRotation();
 
 			const float AngleDifference = FMath::Abs(FMath::Acos(FVector::DotProduct(Direction, Owner->GetActorForwardVector())));
-
 			float DynamicRotationSpeed = FMath::Lerp(MinRotationSpeed, MaxRotationSpeed, AngleDifference / 180.0f);
+
 			FRotator TargetYawRotation(0.f, Direction.Rotation().Yaw, 0.f);
 			FRotator CurrentYawRotation(0.f, CurrentControlRotation.Yaw, 0.f);
-			float InterpedYaw = FMath::RInterpTo(CurrentYawRotation, TargetYawRotation, DeltaTime, DynamicRotationSpeed).Yaw;
+			FRotator TargetPitchRotation(Direction.Rotation().Pitch, 0.f, 0.f);
+			FRotator CurrentPitchRotation(CurrentControlRotation.Pitch, 0.f, 0.f);
 
-			FRotator NewCameraRotation = FRotator(CurrentControlRotation.Pitch, InterpedYaw, CurrentControlRotation.Roll);
+			float InterpedYaw = FMath::RInterpTo(CurrentYawRotation, TargetYawRotation, DeltaTime, DynamicRotationSpeed).Yaw;
+			float InterpedPitch = FMath::RInterpTo(CurrentPitchRotation, TargetPitchRotation, DeltaTime, DynamicRotationSpeed).Pitch;
+
+			FRotator NewCameraRotation = FRotator(InterpedPitch, InterpedYaw, CurrentControlRotation.Roll);
 			PC->SetControlRotation(NewCameraRotation);
 		}
 	}

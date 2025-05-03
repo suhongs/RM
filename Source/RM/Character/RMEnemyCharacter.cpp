@@ -32,6 +32,7 @@ void ARMEnemyCharacter::PossessedBy(AController* NewController)
 
 void ARMEnemyCharacter::HitDetection(const FRMSkillId& InSkillId)
 {
+	Super::HitDetection(InSkillId);
 }
 
 void ARMEnemyCharacter::HitReact()
