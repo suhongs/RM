@@ -22,6 +22,9 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
+private:
+	virtual AActor* GetTarget();
+
 protected:
 	/** 이동 속도 (cm/s) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Approach")
@@ -34,7 +37,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Approach")
 	float MaxApproachDistance = 800.f; // 기본값 예시
 
-private:
+protected:
 	FTimerHandle TimerHandle_ApproachMove;
 
 	/** 현재 이동 경과 시간 */

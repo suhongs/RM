@@ -13,10 +13,7 @@ void URMGameplayAbilityApproach::ActivateAbility(const FGameplayAbilitySpecHandl
 	ARMCharacterBase* OwnerCharacter = Cast<ARMCharacterBase>(AvatarActor);
 	if (!OwnerCharacter) return;
 
-	URMLockOnSystemComponent* LockOnComp = OwnerCharacter->FindComponentByClass<URMLockOnSystemComponent>();
-	if (!LockOnComp || !LockOnComp->LockedTarget) return;
-
-	AActor* Target = LockOnComp->LockedTarget;
+	AActor* Target = GetTarget();
 
 	/*
 		StartLocation	: 현재 내 캐릭터의 위치
@@ -62,4 +59,16 @@ void URMGameplayAbilityApproach::ActivateAbility(const FGameplayAbilitySpecHandl
 		TickInterval,
 		true
 	);
+}
+
+AActor* URMGameplayAbilityApproach::GetTarget()
+{
+	AActor* AvatarActor = GetAvatarActorFromActorInfo();
+	ARMCharacterBase* OwnerCharacter = Cast<ARMCharacterBase>(AvatarActor);
+	if (!OwnerCharacter) return nullptr;
+
+	URMLockOnSystemComponent* LockOnComp = OwnerCharacter->FindComponentByClass<URMLockOnSystemComponent>();
+	if (!LockOnComp || !LockOnComp->LockedTarget) return nullptr;
+
+	return LockOnComp->LockedTarget;
 }
