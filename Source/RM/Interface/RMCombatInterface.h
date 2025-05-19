@@ -31,4 +31,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	virtual void ClearHitActors() = 0;
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	virtual void CharacterDead() = 0;
 };

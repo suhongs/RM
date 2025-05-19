@@ -59,6 +59,9 @@ private:
 	UInputAction* HeavyAttackAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ExecuteAttackAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RollAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -76,12 +79,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LockOnPrevTargetAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	float LookSensitivity = 0.5f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MovementVector", meta = (AllowPrivateAccess = "true"))
 	FVector2D MovementVector;
+
+public:
+	bool bIsDialogueMode = false;
 protected:
 
 	void Move(const FInputActionValue& Value);
@@ -96,6 +105,8 @@ protected:
 
 	void HeavyAttack();
 
+	void ExecuteAttack();
+
 	void Roll();
 
 	void Dodge();
@@ -109,5 +120,7 @@ protected:
 	void LockOnNextTarget();
 
 	void LockOnPrevTarget();
+
+	void Interact();
 
 };

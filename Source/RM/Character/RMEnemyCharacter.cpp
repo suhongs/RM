@@ -7,6 +7,7 @@
 #include "AbilitySystem/RMAttributeSet.h"
 #include "HUD/RMInbodyCursorWidgetComponent.h"
 #include "Subsystem/RMFloatingDamageSubsystem.h"
+#include "Subsystem/RMQuestSubsystem.h"
 
 ARMEnemyCharacter::ARMEnemyCharacter()
 {
@@ -28,6 +29,12 @@ void ARMEnemyCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	InitDefaultAbility();
 	Super::InitDefaultAttributes();
+
+	if (IsValid(AttributeSet))
+	{
+		AttributeSet->OnCharacterDead.AddDynamic(this, &ARMEnemyCharacter::CharacterDead);
+	}
+
 }
 
 void ARMEnemyCharacter::HitDetection(const FRMSkillId& InSkillId)
@@ -65,6 +72,21 @@ void ARMEnemyCharacter::InitAbilityActorInfo()
 		return;
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+}
+
+void ARMEnemyCharacter::CharacterDead()
+{
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+		return;
+
+	URMQuestSubsystem* QuestSubsystem = World->GetGameInstance()->GetSubsystem<URMQuestSubsystem>();
+	if (!IsValid(QuestSubsystem))
+		return;
+
+	QuestSubsystem->OnMonsterKilled(CharacterName);
+
+	Destroy();
 }
 
 void ARMEnemyCharacter::ShowInbodyCursor()

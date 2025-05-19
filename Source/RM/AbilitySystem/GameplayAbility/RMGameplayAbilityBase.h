@@ -18,6 +18,13 @@ class RM_API URMGameplayAbilityBase : public UGameplayAbility
 public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
+
+	UFUNCTION()
+	virtual void OnEndAbility();
+
+	void GetGameplayEffectsWhileAnimating(TArray<const UGameplayEffect*>& OutEffects) const;
+	
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MontageAbility)
 	TObjectPtr<UAnimMontage> 	MontageToPlay;
 
@@ -27,6 +34,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = MontageAbility)
 	FName	SectionName;
 
+	UPROPERTY(EditDefaultsOnly, Category = Effect)
+	float	Cost = 0;
+
+	UPROPERTY(EditDefaultsOnly, Category = Effect)
+	float	Cooldown = 0;
+
 	/** GameplayEffects to apply and then remove while the animation is playing */
 	UPROPERTY(EditDefaultsOnly, Category = MontageAbility)
 	TArray<TSubclassOf<UGameplayEffect>> GameplayEffectClassesWhileAnimating;
@@ -35,10 +48,6 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Deprecated)
 	TArray<TObjectPtr<const UGameplayEffect>>	GameplayEffectsWhileAnimating;
 
-	UFUNCTION()
-	virtual void OnEndAbility();
 
-	void GetGameplayEffectsWhileAnimating(TArray<const UGameplayEffect*>& OutEffects) const;
-	
 	
 };

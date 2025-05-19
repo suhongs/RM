@@ -17,6 +17,7 @@
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnHealthChangedDelegate, float, float);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnManaChangedDelegate, float, float);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEffectExecuted, const FGameplayEffectModCallbackData&)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterDead);
 
 UCLASS()
 class RM_API URMAttributeSet : public UAttributeSet
@@ -26,8 +27,15 @@ class RM_API URMAttributeSet : public UAttributeSet
 public:
 	URMAttributeSet();
 
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
+	void AdjustChangeMaxAttribute(
+		FGameplayAttributeData& CurrentAttribute,
+		const FGameplayAttributeData& MaxAttribute,
+		float NewValue,
+		const FGameplayAttribute& AffectAttributeProperty);
 public:
 
 	// ========== Health ==========
@@ -62,5 +70,5 @@ public:
 	FOnManaChangedDelegate OnManaChanged;
 
 	FOnEffectExecuted OnEffectExecuted;
-
+	FOnCharacterDead OnCharacterDead;
 };

@@ -76,7 +76,7 @@ void ARMProjectileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent,
 
 		if (HitCharacter && CombatInterface)
 		{
-			HitProcessingSubsystem->ProcessHit(OwnerCharacter, HitCharacter, SkillId);
+			HitProcessingSubsystem->ProcessHit(OwnerCharacter, SweepResult, SkillId);
 
 			CombatInterface->HitReact();
 		}

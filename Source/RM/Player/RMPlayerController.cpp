@@ -11,7 +11,11 @@
 #include "AbilitySystemComponent.h"
 #include "CombatSystem/RMAimComponent.h"
 #include "CombatSystem/RMLockOnSystemComponent.h"
+#include "Interact/RMInteractComponent.h"
 #include "HUD/RMHUD.h"
+#include "Subsystem/RMDialogueSubsystem.h"
+#include "Character/RMQuestGiverCharacter.h"
+
 
 ARMPlayerController::ARMPlayerController()
 {
@@ -64,6 +68,7 @@ void ARMPlayerController::SetupInputComponent()
 		// Combat
 		EnhancedInputComponent->BindAction(LightAttackAction, ETriggerEvent::Started, this, &ARMPlayerController::LightAttack);
 		EnhancedInputComponent->BindAction(HeavyAttackAction, ETriggerEvent::Started, this, &ARMPlayerController::HeavyAttack);
+		EnhancedInputComponent->BindAction(ExecuteAttackAction, ETriggerEvent::Started, this, &ARMPlayerController::ExecuteAttack);
 
 		// Utilities
 		EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Started, this, &ARMPlayerController::Roll);
@@ -74,6 +79,9 @@ void ARMPlayerController::SetupInputComponent()
 		EnhancedInputComponent->BindAction(LockOnAction, ETriggerEvent::Completed, this, &ARMPlayerController::LockOnStop);
 		EnhancedInputComponent->BindAction(LockOnNextTargetAction, ETriggerEvent::Started, this, &ARMPlayerController::LockOnNextTarget);
 		EnhancedInputComponent->BindAction(LockOnPrevTargetAction, ETriggerEvent::Started, this, &ARMPlayerController::LockOnPrevTarget);
+
+		//Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ARMPlayerController::Interact);
 	}
 }
 
@@ -140,6 +148,17 @@ void ARMPlayerController::StopJump(const FInputActionValue& Value)
 
 void ARMPlayerController::LightAttack()
 {
+	if (bIsDialogueMode)
+	{
+		URMDialogueSubsystem* DialogueSubsystem = GetGameInstance()->GetSubsystem<URMDialogueSubsystem>();
+		if (IsValid(DialogueSubsystem))
+		{
+			DialogueSubsystem->HandleDialogueClick(true);
+		}
+
+		return;
+	}
+
 	if (AbilitySystemComponent == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is nullptr"));
@@ -156,6 +175,18 @@ void ARMPlayerController::LightAttack()
 
 void ARMPlayerController::HeavyAttack()
 {
+	if (bIsDialogueMode)
+	{
+		URMDialogueSubsystem* DialogueSubsystem = GetGameInstance()->GetSubsystem<URMDialogueSubsystem>();
+		if (IsValid(DialogueSubsystem))
+		{
+			DialogueSubsystem->HandleDialogueClick(false);
+		}
+
+		return;
+	}
+
+
 	if (AbilitySystemComponent == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is nullptr"));
@@ -172,6 +203,27 @@ void ARMPlayerController::HeavyAttack()
 	if (!bActivated)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Failed to activate HeavyAttack ability"));
+	}
+}
+
+void ARMPlayerController::ExecuteAttack()
+{
+	if (AbilitySystemComponent == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AbilitySystemComponent is nullptr"));
+		return;
+	}
+
+	FGameplayTag ExecuteAttackTag = FGameplayTag::RequestGameplayTag(FName("Player.Attack.ExecuteAttack.01"));
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(ExecuteAttackTag);
+
+	bool bActivated = AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
+
+	if (!bActivated)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to activate ExecuteAttack ability"));
 	}
 }
 
@@ -361,4 +413,17 @@ void ARMPlayerController::LockOnPrevTarget()
 		return;
 
 	LSC->LockOnPrevTarget();
+}
+
+void ARMPlayerController::Interact()
+{
+	ARMPlayerCharacter* ControlledCharacter = Cast<ARMPlayerCharacter>(GetPawn());
+	if (!IsValid(ControlledCharacter))
+		return;
+
+	URMInteractComponent* InteractComponent = ControlledCharacter->GetInteractComponent();
+	if (!IsValid(InteractComponent))
+		return;
+
+	InteractComponent->Interact();
 }

@@ -24,6 +24,22 @@ public:
 	virtual void BeginPlay() override;
 	void InitHUD(APlayerController* InPC, APlayerState* InPS, ARMCharacterBase* InActor, UAbilitySystemComponent* InAbilitySystemComponent);
 
+	template <typename T>
+	T* GetWidgetManager() const
+	{
+		if (TIsDerivedFrom<T, URMWidgetManagerBase>::IsDerived)
+		{
+			for (URMWidgetManagerBase* Manager : WidgetManagers)
+			{
+				if (T* CastedManager = Cast<T>(Manager))
+				{
+					return CastedManager;
+				}
+			}
+		}
+		return nullptr;
+	}
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Widget")
 	TSubclassOf<URMWidgetManagerBase> HUDWidgetManagerClass;
@@ -37,9 +53,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr<URMWidgetManagerBase> CrosshairWidgetManager;
 
-	
-	/*인벤토리 제작 후 InventoryWidgetManager 선언
+	UPROPERTY(EditDafaultsOnly, BlueprintReadWrite, Category = "Widget")
+	TSubclassOf<URMWidgetManagerBase> FloatingDamageWidgetManagerClass;
+
 	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<URMInventoryWidgetManager> InventoryWidgetManager;
-	*/
+	TObjectPtr<URMWidgetManagerBase> FloatingDamageWidgetManager;
 };

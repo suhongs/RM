@@ -41,6 +41,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Name)
+	FName CharacterName;
+
 	// AbilitySystem Component
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -55,7 +58,7 @@ public:
 	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-	TSubclassOf<UGameplayEffect> DefaultStatEffect;
+	TArray<TSubclassOf<UGameplayEffect>> DefaultStatEffects;
 
 
 public:
@@ -65,6 +68,9 @@ public:
 	virtual void HitReact() override;
 
 	virtual void ClearHitActors() override;
+
+	virtual void CharacterDead() override;
+
 protected:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMesh> WeaponMesh;
@@ -77,5 +83,4 @@ public:
 	URMAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	URMLockOnSystemComponent* GetLockOnSystemComponent() const { return LockOnSystemComponent; }
 
-	
 };

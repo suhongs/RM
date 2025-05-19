@@ -40,12 +40,12 @@ void ARMCharacterBase::InitAbilityActorInfo()
 
 void ARMCharacterBase::InitDefaultAbility()
 {
-	if (IsValid(AbilitySystemComponent) == false)
+	if (!IsValid(AbilitySystemComponent))
 		return;
 
 	for (auto Ability : DefaultAbilities)
 	{
-		if (IsValid(Ability) == false)
+		if (!IsValid(Ability))
 			continue;
 
 		AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(Ability, 0, 0, this));
@@ -68,18 +68,25 @@ void ARMCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void ARMCharacterBase::InitDefaultAttributes()
 {
-	if (AbilitySystemComponent && DefaultStatEffect)
+	if (AbilitySystemComponent)
 	{
-		FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-		EffectContext.AddSourceObject(this);
-
-		FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(DefaultStatEffect, 1.0f, EffectContext);
-		if (SpecHandle.IsValid())
+		for (TSubclassOf<UGameplayEffect> Effect : DefaultStatEffects)
 		{
-			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			if (!IsValid(Effect))
+				continue;
+
+			FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+			EffectContext.AddSourceObject(this);
+
+			FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1.0f, EffectContext);
+			if (SpecHandle.IsValid())
+			{
+				AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			}
 		}
 	}
 }
+
 
 void ARMCharacterBase::HitDetection(const FRMSkillId& InSkillId)
 {
@@ -165,9 +172,10 @@ void ARMCharacterBase::HitDetection(const FRMSkillId& InSkillId)
 			// 충돌된 적을 목록에 추가하고, 대미지 입히기
 			HitActors.Add(HitActor);
 
-			HitProcessingSubsystem->ProcessHit(this, HitCharacter, InSkillId);
+			HitProcessingSubsystem->ProcessHit(this, HitResult, InSkillId);
+			//HitProcessingSubsystem->ProcessHit(this, HitCharacter, InSkillId);
 
-			CombatInterface->HitReact();
+			//CombatInterface->HitReact();
 		}
 	}
 }
@@ -180,7 +188,7 @@ void ARMCharacterBase::HitReact()
 		return;
 	}
 
-	FGameplayTag HitReactTag = FGameplayTag::RequestGameplayTag(FName("Common.Combat.HitReact"));
+	FGameplayTag HitReactTag = FGameplayTag::RequestGameplayTag(FName("Common.Combat.HitReact.Basic"));
 
 	FGameplayTagContainer TagContainer;
 	TagContainer.AddTag(HitReactTag);
@@ -191,6 +199,10 @@ void ARMCharacterBase::HitReact()
 void ARMCharacterBase::ClearHitActors()
 {
 	HitActors.Empty();
+}
+
+void ARMCharacterBase::CharacterDead()
+{
 }
 
 UAbilitySystemComponent* ARMCharacterBase::GetAbilitySystemComponent() const

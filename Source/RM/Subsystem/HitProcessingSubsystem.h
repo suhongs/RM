@@ -14,6 +14,7 @@
  */
 class ARMCharacterBase;
 struct FRMSkillData;
+struct FHitResult;
 
 UCLASS()
 class RM_API UHitProcessingSubsystem : public UGameInstanceSubsystem
@@ -24,7 +25,7 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 	// ÇÙ½É ÇÔ¼ö
-	void ProcessHit(ARMCharacterBase* InstigatorActor, ARMCharacterBase* TargetActor, const FRMSkillId& SkillId);
+	void ProcessHit(ARMCharacterBase* InstigatorActor, const FHitResult& HitResult, const FRMSkillId& SkillId);
 
 	const FRMSkillData* GetSkillDataById(const FRMSkillId& InSkillId);
 

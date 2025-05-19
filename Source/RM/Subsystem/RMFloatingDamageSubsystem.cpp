@@ -48,6 +48,18 @@ void URMFloatingDamageSubsystem::RegisterWithAbilitySystem(ARMCharacterBase* InC
 
 void URMFloatingDamageSubsystem::DisplayFloatingDamage(const FOnAttributeChangeData& Data)
 {
+	if (Data.GEModData == nullptr)
+		return;
+
+	FGameplayEffectContextHandle Handle = Data.GEModData->EffectSpec.GetContext();
+	if (Handle.IsValid())
+	{
+		if (Handle.GetInstigator())
+		{
+			UE_LOG(LogTemp, Log, TEXT("%s"), *Handle.GetInstigator()->GetName());
+		}
+	}
+
 	float FinalDamage = Data.OldValue - Data.NewValue;
 
 	ARMFloatingDamage* FloatingDamageActor = Cast<ARMFloatingDamage>(WidgetPool->RequestObject(GetWorld()));

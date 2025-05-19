@@ -14,6 +14,8 @@ void URMGameplayAbilityApproach::ActivateAbility(const FGameplayAbilitySpecHandl
 	if (!OwnerCharacter) return;
 
 	AActor* Target = GetTarget();
+	if (!IsValid(Target))
+		return;
 
 	/*
 		StartLocation	: 현재 내 캐릭터의 위치

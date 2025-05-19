@@ -6,7 +6,9 @@
 #include "Character/RMCharacterBase.h"
 #include "RMPlayerCharacter.generated.h"
 
+class URMInteractComponent;
 class USpringArmComponent;
+class ARMProjectileBase;
 class UCameraComponent;
 class URMAimComponent;
 
@@ -27,6 +29,7 @@ protected:
 
 public:
 	URMAimComponent* GetAimComponent() const { return AimComponent; }
+	URMInteractComponent* GetInteractComponent() const { return InteractComponent; }
 
 	UFUNCTION(BlueprintCallable)
 	void RotateCharacterToCameraYaw();
@@ -52,15 +55,13 @@ private:
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SpearMesh", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class ARMProjectileBase> ProjectileClass;
+	TSubclassOf<ARMProjectileBase> ProjectileClass;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Aim")
 	TObjectPtr<URMAimComponent> AimComponent;
 
-public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effects/LightAttack")
-	TSubclassOf<UGameplayEffect> LightAttackEffect;
-
+private:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<URMInteractComponent> InteractComponent;
 };

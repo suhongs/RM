@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/GameplayAbility/RMGameplayAbilityBase.h"
+#include "AbilitySystem/GameplayAbility/RMGameplayAbilityCombo.h"
 #include "RMGameplayAbilityApproach.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class RM_API URMGameplayAbilityApproach : public URMGameplayAbilityBase
+class RM_API URMGameplayAbilityApproach : public URMGameplayAbilityCombo
 {
 	GENERATED_BODY()
 

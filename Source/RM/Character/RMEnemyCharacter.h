@@ -38,6 +38,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
 
+public:
+	virtual void CharacterDead() override;
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Widget")
 	TObjectPtr<class URMFloatingHpBarWidgetComponent> FloatingHealthBarWidgetComponent;
@@ -47,5 +49,7 @@ protected:
 public:
 	virtual void ShowInbodyCursor() override;
 	virtual void HideInbodyCursor() override;
+
+
 	
 };

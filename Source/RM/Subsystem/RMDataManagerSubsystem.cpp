@@ -17,6 +17,8 @@ void URMDataManagerSubsystem::LoadAllDataTables()
 
 	TArray<FTableLoadInfo> TablesToLoad = {
 		{ TEXT("Skill"), TEXT("/Game/DataTable/DT_SkillData") },
+		{ TEXT("Quest"), TEXT("/Game/DataTable/DT_QuestData") }
+
 		// 여기에 더 추가 가능
 	};
 
@@ -30,31 +32,6 @@ void URMDataManagerSubsystem::LoadAllDataTables()
 	}
 }
 
-//void URMDataManagerSubsystem::LoadAllDataTables()
-//{
-//    TArray<FTableLoadInfo> TablesToLoad = {
-//        { TEXT("Skill"), TEXT("/Game/DataTable/DT_SkillData") },
-//        // 여기에 더 추가 가능
-//    };
-//
-//    // 비동기 로딩
-//    for (const FTableLoadInfo& Info : TablesToLoad)
-//    {
-//        FStreamableManager& AssetLoader = UGameplayStatics::GetStreamableManager();
-//        TAssetPtr<UDataTable> TablePtr = FAssetPtr<UDataTable>(FSoftObjectPath(Info.Path));
-//
-//        // 비동기 로딩, 로딩 후에 OnDataTableLoaded 호출
-//        AssetLoader.RequestAsyncLoad(TablePtr.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &URMDataManagerSubsystem::OnDataTableLoaded, Info));
-//    }
-//}
-//
-//void URMDataManagerSubsystem::OnDataTableLoaded(const FTableLoadInfo& TableInfo)
-//{
-//    if (UDataTable* LoadedTable = Cast<UDataTable>(StaticLoadObject(UDataTable::StaticClass(), nullptr, *TableInfo.Path)))
-//    {
-//        CachedTables.Add(TableInfo.Id, LoadedTable);
-//    }
-//}
 template<typename T>
 const T* URMDataManagerSubsystem::FindRow(FName TableId, FName RowName) const
 {

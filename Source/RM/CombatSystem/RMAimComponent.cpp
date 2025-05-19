@@ -43,7 +43,7 @@ void URMAimComponent::BeginPlay()
 
 void URMAimComponent::EnterAimMode()
 {
-	if (!CameraBoom || !FollowCamera || bIsAiming)
+	if (!CameraBoom || !FollowCamera)
 		return;
 
 	if (!IsValid(OwnerCharacter))
@@ -65,7 +65,7 @@ void URMAimComponent::EnterAimMode()
 
 void URMAimComponent::ExitAimMode()
 {
-	if (!CameraBoom || !FollowCamera || !bIsAiming)
+	if (!CameraBoom || !FollowCamera)
 		return;
 
 	AlignToCamera(false);

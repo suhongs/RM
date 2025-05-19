@@ -31,4 +31,10 @@ void ARMHUD::InitHUD(APlayerController* InPC, APlayerState* InPS, ARMCharacterBa
 		CrosshairWidgetManager->InitWidget();
 	}
 
+	if (FloatingDamageWidgetManagerClass)
+	{
+		FloatingDamageWidgetManager = NewObject<URMFloatingDamageWidgetManager>(this, FloatingDamageWidgetManagerClass);
+		FloatingDamageWidgetManager->SetWidgetManagerParams(WidgetManagerParams);
+		FloatingDamageWidgetManager->InitWidget();
+	}
 }

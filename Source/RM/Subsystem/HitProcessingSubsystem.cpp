@@ -12,10 +12,17 @@ void UHitProcessingSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 }
 
-void UHitProcessingSubsystem::ProcessHit(ARMCharacterBase* InstigatorActor, ARMCharacterBase* TargetActor, const FRMSkillId& SkillId)
+void UHitProcessingSubsystem::ProcessHit(ARMCharacterBase* InstigatorActor, const FHitResult& HitResult, const FRMSkillId& SkillId)
 {
 	const FRMSkillData* SkillData = GetSkillDataById(SkillId);
-	if (!SkillData || !TargetActor) return;
+	if (!SkillData) 
+		return;
+
+
+	AActor* HitActor = HitResult.GetActor();
+	ARMCharacterBase* TargetActor = HitActor ? Cast<ARMCharacterBase>(HitActor) : nullptr;
+	if (!IsValid(TargetActor))
+		return;
 
 	// ¿¹: GameplayEffect Àû¿ë
 	if (SkillData->Effects)
@@ -24,8 +31,11 @@ void UHitProcessingSubsystem::ProcessHit(ARMCharacterBase* InstigatorActor, ARMC
 		{
 			FGameplayEffectContextHandle Context = TargetASC->MakeEffectContext();
 			Context.AddSourceObject(InstigatorActor);
+			Context.AddInstigator(InstigatorActor, InstigatorActor);
+			Context.AddHitResult(HitResult);
 
 			FGameplayEffectSpecHandle SpecHandle = TargetASC->MakeOutgoingSpec(SkillData->Effects, 1.0f, Context);
+			
 			if (SpecHandle.IsValid())
 			{
 				TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());

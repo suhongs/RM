@@ -10,7 +10,7 @@
 #include "AbilitySystem/RMAbilitySystemComponent.h"
 #include "Subsystem/HitProcessingSubsystem.h"
 #include "CombatSystem/RMLockOnSystemComponent.h"
-
+#include "Subsystem/RMDialogueSubsystem.h"
 #include "Projectile/RMProjectileBase.h"
 
 // For Debug
@@ -32,7 +32,11 @@ ARMPlayerCharacter::ARMPlayerCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	// Aim Component
 	AimComponent = CreateDefaultSubobject<URMAimComponent>(TEXT("AimComponent"));
+
+	// Interact Component
+	InteractComponent = CreateDefaultSubobject<URMInteractComponent>(TEXT("InteractComponent"));
 }
 
 void ARMPlayerCharacter::PossessedBy(AController* NewController)
@@ -42,6 +46,12 @@ void ARMPlayerCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	InitDefaultAbility();
 	Super::InitDefaultAttributes();
+
+	URMDialogueSubsystem* DialogueSubsystem = GetGameInstance()->GetSubsystem<URMDialogueSubsystem>();
+	if (IsValid(DialogueSubsystem))
+	{
+		DialogueSubsystem->RegistPlayerCharacter(this);
+	}
 }
 
 void ARMPlayerCharacter::InitAbilityActorInfo()
